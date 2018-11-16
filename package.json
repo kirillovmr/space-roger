@@ -1,6 +1,6 @@
 {
   "name": "space-roger",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Browser clicker game built with React & Redux",
   "main": "index.js",
   "scripts": {
@@ -24,6 +24,7 @@
     "lodash": "^3.10.1",
     "react": "16.3.2",
     "react-dom": "16.3.2",
+    "react-motion": "^0.5.2",
     "react-redux": "5.0.7",
     "redux": "4.0.0"
   }

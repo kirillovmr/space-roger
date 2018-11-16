@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
 
-import particlesConfig from './particles-config';
+import particlesConfig from '../config/particles-config';
 
 class Background extends Component {
   mount = false;

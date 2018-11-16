@@ -53,7 +53,7 @@ canvas {
 }
 
 .fire {
-  margin-top: 40px;
+  margin-top: 50px;
 }
 .fire-main {
   z-index: 200;
@@ -61,6 +61,53 @@ canvas {
 .fire-supply {
   z-index: 98;
 }
+.fire-anim-back {
+  animation: fire-back .4s infinite;
+}
+.fire-anim-front {
+  animation: fire-front .4s infinite;
+}
+.hidden {
+  display: none;
+}
+
+@keyframes fire-front {
+  0% {
+    transform:translate(0, 0);
+  }
+  25% {
+    transform:translate(2px, 0);
+  }
+  50% {
+    transform:translate(0, 0);
+  }
+  75% {
+    transform:translate(-2px, 0);
+  }
+  100% {
+    transform:translate(0, 0);
+  }
+}
+
+@keyframes fire-back {
+  0% {
+    transform:translate(0, 0);
+  }
+  25% {
+    transform:translate(0, 14px);
+  }
+  50% {
+    transform:translate(0, 0);
+  }
+  75% {
+    transform:translate(0, 14px);
+  }
+  100% {
+    transform:translate(0, 0);
+  }
+}
+
+
 
 /* ---- UI ---- */
 .top-ui {
