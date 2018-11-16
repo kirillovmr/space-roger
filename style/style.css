@@ -1,0 +1,175 @@
+/* ---- reset ---- */
+.container, .row, div[class^='col'], div[class*=' col'], p {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  /* background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%); */
+}
+
+
+body {
+  margin: 0;
+  background: #17182f;
+  overflow: hidden;
+  -webkit-user-select: none;
+     -moz-user-select: -moz-none;
+      -ms-user-select: none;
+          user-select: none;
+}
+
+canvas {
+  display: block;
+  vertical-align: bottom;
+}
+
+.rockets {
+  position: absolute;
+  width: 100%;
+  bottom: 220px;
+}
+
+#rocket-block, #rocket-supply-block {
+  margin: auto;
+  position: relative !important;
+}
+
+#rocket-supply-block {
+  top: 20px;
+  left: -50px;
+}
+
+.rocket, .fire, #rocket-block, #rocket-supply-block {
+  position: absolute;
+  width: 120px;
+}
+
+#rocket-main {
+  z-index: 201;
+}
+#rocket-supply {
+  z-index: 99;
+}
+
+.fire {
+  margin-top: 40px;
+}
+.fire-main {
+  z-index: 200;
+}
+.fire-supply {
+  z-index: 98;
+}
+
+/* ---- UI ---- */
+.top-ui {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  top:2vh;
+  color: #fff;
+}
+.top-ui-row>div {
+  margin: auto;
+}
+.fuel, .speed, .distance {
+  color: #aaa;
+  font-size: .7em;
+  text-transform: uppercase;
+}
+.distance-value {
+  font-size: 1.5em;
+}
+
+.perks-upgrades {
+  position: absolute;
+  width: 100%;
+  top: 100px;
+}
+.perks-block, .upgrades-block {
+  position: absolute;
+  overflow-y: scroll;
+  height: 60vh;
+}
+.perks-block {
+  left: 30px;
+}
+.upgrades-block {
+  right: 30px;
+}
+.perk, .upgrade, #global, #settings {
+  margin-bottom:20px;
+  width:100px;
+  height:100px;
+  background-repeat:no-repeat;
+  z-index: 180;
+}
+.perk, .upgrade {
+  background-image:url("../img/icon-locked.svg");
+}
+.unlocked {
+  background-image:url("../img/icon.svg") !important;
+}
+.perk-upgrade-inside-icon {
+  margin-left:25%;
+  margin-top:25%;
+}
+.perk-upgrade-cost {
+  color:#fff;
+  margin-top:-15%;
+  font-weight:700;
+  text-shadow:1px 1px #000;
+  text-align: center;
+}
+.upgrade-level {
+  position:absolute;
+  color:#fff;
+  margin-top:20px;
+  margin-left:23px;
+  font-weight:600;
+  text-shadow:1px 1px #000;
+}
+
+.bottom-ui {
+  position: absolute;
+  bottom: 130px;
+}
+
+#global {
+  position: absolute;
+  background-image: url("../img/ui_icon-global.svg");
+  left: 30px;
+}
+
+#settings {
+  position: absolute;
+  background-image: url("../img/ui_icon-settings.svg");
+  left: calc(100vw - 100px - 30px);
+}
+
+/* ---- MEDIA ---- */
+@media (max-width: 767px) {
+  .perk, .upgrade, #global, #settings {
+    width:60px;
+    height:60px;
+  }
+  .bottom-ui {
+    bottom: 90px;
+  }
+  #settings {
+    left: calc(100vw - 60px - 30px);
+  }
+  .upgrade-level {
+    margin-top:7px;
+    margin-left:13px;
+  }
+}
+
+
+/* ---- particles.js container ---- */
+#particles-js {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
