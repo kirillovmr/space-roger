@@ -12,6 +12,7 @@ class BottomUI extends Component {
   }
 
   render() {
+    console.log('🖥Rerender ui-bottom');
     return (
       <div className="row align-items-end bottom-ui">
         <div className="col-3 col-sm-3 col-md-2 offset-1 offset-sm-2 offset-md-2 offset-lg-2 offset-xl-2" id="left-bottom-button">

@@ -2,7 +2,7 @@ import {SET_BG_SPEED, INCREASE_BG_SPEED_BY1,
   REFILL_BG_SPEED, RESTORE_BG_SPEED} from '../actions';
 
 const initialState = {
-  speed: 5
+  speed: 5,
 };
 
 export default function(state = initialState, action) {

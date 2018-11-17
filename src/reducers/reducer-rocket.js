@@ -1,4 +1,5 @@
-import {INCREASE_DISTANCE_BY_CLICK, TOGGLE_REFILL} from '../actions';
+import {INCREASE_DISTANCE_BY_CLICK, TOGGLE_REFILL,
+  STOP_FLYING, START_FLYING } from '../actions';
 import rates from '../config/rates';
 
 const initialState = {
@@ -8,7 +9,10 @@ const initialState = {
   fuelMax: 1,
   speed: 0,
   clickMultiplier: 1,
-  refilling: false
+  refilling: false,
+  flying: false,
+  perks: [],
+  upgrades: [],
 };
 
 export default function(state = initialState, action) {
@@ -64,7 +68,12 @@ export default function(state = initialState, action) {
         // Start refilling
         return {...state, refilling: !state.refilling};
       }
+
+    case STOP_FLYING:
+      return {...state, flying: false};
       
+    case START_FLYING:
+      return {...state, flying: true};
       
     default:
       return state;

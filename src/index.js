@@ -12,7 +12,7 @@ const store = createStoreWithMiddleware(reducers);
 console.log(store.getState());
 
 store.subscribe(() => {
-  console.log(store.getState());
+  // console.log(store.getState());
 });
 
 ReactDOM.render(

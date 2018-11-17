@@ -4,7 +4,10 @@ import {connect} from 'react-redux';
 import particlesConfig from '../config/particles-config';
 
 class Background extends Component {
-  mount = false;
+  constructor(props) {
+    super(props)
+    this.mount = false;
+  }
 
   componentDidMount() {
     particlesJS("particles-js", particlesConfig);
@@ -16,6 +19,7 @@ class Background extends Component {
   }
 
   render() {
+    console.log('🖥Rerender Backgroung');
     if(this.mount) {
       this.setSpeed();
     }
