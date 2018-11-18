@@ -1,5 +1,5 @@
-import {SET_BG_SPEED, INCREASE_BG_SPEED_BY1, 
-  REFILL_BG_SPEED, RESTORE_BG_SPEED} from '../actions';
+import {SET_BG_SPEED, 
+  REFILL_BG_SPEED, ROCKET_CLICKED} from '../actions';
 
 const initialState = {
   speed: 5,
@@ -7,7 +7,7 @@ const initialState = {
 
 export default function(state = initialState, action) {
   switch (action.type) {
-    case INCREASE_BG_SPEED_BY1:
+    case ROCKET_CLICKED:
       return {...state, speed: state.speed + 1};
     case SET_BG_SPEED:
       return {...state, speed: action.payload};

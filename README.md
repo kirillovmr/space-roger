@@ -47,6 +47,7 @@ This software uses the following open source packages:
 - [React](https://reactjs.org)
 - [React Motion](https://github.com/chenglou/react-motion)
 - [React Key Handler](https://www.npmjs.com/package/react-key-handler)
+- [React-Countup](https://github.com/glennreyes/react-countup)
 - [Redux](https://redux.js.org)
 - [Lodash](https://lodash.com)
 - [Webpack](https://webpack.js.org)

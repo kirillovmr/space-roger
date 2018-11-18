@@ -5,12 +5,16 @@ import {connect} from 'react-redux';
 import {Motion, spring} from 'react-motion';
 import KeyHandler, { KEYPRESS } from 'react-key-handler';
 
-import { increaseBGSpeedBy1, increaseDistanceByClick,
-  stopFlying, startFlying } from '../actions';
+import { increaseDistanceByClick,
+  stopFlying, startFlying, rocketClicked } from '../actions';
+
+import {hasPerk} from '../misc';
+
+import {refillClicked} from './ui-top';
 
 class Rockets extends Component {
   shouldComponentUpdate(nextProps) {
-    if (this.props.rocket.distance === nextProps.rocket.distance - 1 * this.props.rocket.clickMultiplier) {
+    if (this.props.rocket.flying === nextProps.rocket.flying && this.props.rocket.refilling === nextProps.rocket.refilling) {
       return false;
     };
 
@@ -19,10 +23,11 @@ class Rockets extends Component {
 
   rocketClicked() {
     if (!this.props.rocket.refilling && this.props.rocket.fuel > 0) {
-      this.props.increaseBGSpeedBy1();
-      this.props.increaseDistanceByClick();
 
+      this.props.rocketClicked();
       this.fireTimer();
+    } else if (!this.props.rocket.refilling && this.props.rocket.fuel <= 0 && hasPerk('autofuel', this.props.rocket.perks)) {
+      refillClicked();
     }
   }
 
@@ -94,8 +99,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
-    increaseBGSpeedBy1,
     increaseDistanceByClick,
+    rocketClicked,
     stopFlying, startFlying,
   }, dispatch);
 }

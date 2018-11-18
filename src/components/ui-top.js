@@ -1,31 +1,37 @@
 import React, { Component } from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
+import CountUp from 'react-countup';
 
 import KeyHandler, { KEYPRESS } from 'react-key-handler';
 
 import {toggleRefill, refillBGSpeed, setBGSpeed} from '../actions';
-// import {slow} from '../misc/bg-speed';
+
+export function refillClicked() {
+  if(!this.props.rocket.refilling && this.props.rocket.fuel !== this.props.rocket.fuelMax && this.props.rocket.distance > 0) {
+    this.props.toggleRefill();
+    this.bgSlower();
+
+    setTimeout(() => {
+      this.props.toggleRefill();
+      setTimeout(() => this.bgSpeeder(), 1000);
+    }, 3000);
+  }
+}
  
 class TopUI extends Component {
+  componentDidMount() {
+    refillClicked = refillClicked.bind(this);
+  }
+
   shouldComponentUpdate(nextProps) {
-    if (this.props.distance === nextProps.distance) {
+    if (this.props.rocket.distance === nextProps.distance && 
+        this.props.rocket.fuel === nextProps.fuel && 
+        this.props.rocket.speed === nextProps.speed) {
       return false;
     };
 
     return true;
-  }
-
-  refillClicked() {
-    if(!this.props.refilling && this.props.fuel !== this.props.fuelMax && this.props.distance > 0) {
-      this.props.toggleRefill();
-      this.bgSlower();
-
-      setTimeout(() => {
-        this.props.toggleRefill();
-        setTimeout(() => this.bgSpeeder(), 1000);
-      }, 3000);
-    }
   }
 
   // Slows stars on the background
@@ -42,7 +48,7 @@ class TopUI extends Component {
     }, 100);
   }
   async bgSpeeder() {
-    if (!this.props.flying) {
+    if (!this.props.rocket.flying) {
       return;
     }
     let x = 5;
@@ -57,27 +63,49 @@ class TopUI extends Component {
     }, 100);
   }
 
+  formatNumber(number) {
+    return number;
+  }
+
+  counter(param) {
+    let decimals = 1;
+    if (param === 'distance') {
+      decimals = 2;
+    } else if (param === 'fuel') {
+      decimals = 3;
+    }
+
+    return (
+      <CountUp 
+        start={this.formatNumber(this.props.rocket.previous[param])} 
+        end={this.formatNumber(this.props.rocket[param])} 
+        duration={0.6}
+        decimals={decimals} />
+    );
+  }
+
   render() {
     console.log('🖥Rerender ui-top');
+
     return(
       <div className="row justify-content-center top-ui">
         <KeyHandler
           keyEventName={KEYPRESS}
           keyValue="r"
-          onKeyHandle={this.refillClicked.bind(this)}
+          onKeyHandle={refillClicked}
         />
         <div className="col-12 col-sm-9 col-md-6">
           <div className="row top-ui-row">
-            <div className="col-4" onClick={this.refillClicked.bind(this)}>
-              <p className="fuel-value">{this.props.fuel.toFixed(3)}</p>
+            <div className="col-4" onClick={refillClicked}>
+              <p className="fuel-value">{this.counter('fuel')}</p>
               <p className="fuel">Fuel</p>
             </div>
             <div className="col-4">
-              <p className="distance-value">{this.props.distance.toFixed(3)}</p>
+              <p className="distance-value">{this.counter('distance')}</p>
               <p className="distance">Distance</p>
             </div>
             <div className="col-4">
-              <p className="speed-value">{this.props.speed}</p>
+              <p className="speed-value">{this.counter('speed')}</p>
               <p className="speed">Speed</p>
             </div>
           </div>
@@ -89,13 +117,8 @@ class TopUI extends Component {
 
 function mapStateToProps(state) {
   return {
-    fuel: state.rocket.fuel,
-    fuelMax: state.rocket.fuelMax,
-    distance: state.rocket.distance,
-    speed: state.rocket.speed,
-    refilling: state.rocket.refilling,
-    flying: state.rocket.flying,
-    starSpeed: state.background.speed
+    rocket: state.rocket,
+    starSpeed: state.background.speed,
   }
 }
 

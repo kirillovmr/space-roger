@@ -6,6 +6,8 @@ import TopUI from './ui-top';
 import MiddleUI from './ui-middle';
 import BottomUI from './ui-bottom';
 
+require('./test');
+
 export default class App extends Component {
   render() {
     return (
@@ -19,3 +21,4 @@ export default class App extends Component {
     );
   }
 }
+

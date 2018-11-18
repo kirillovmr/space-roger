@@ -1,6 +1,8 @@
-import {INCREASE_DISTANCE_BY_CLICK, TOGGLE_REFILL,
-  STOP_FLYING, START_FLYING } from '../actions';
+import {ROCKET_CLICKED, TOGGLE_REFILL,
+  STOP_FLYING, START_FLYING, APPLY_PERK } from '../actions';
+
 import rates from '../config/rates';
+import {perks as allPerks} from '../config/perks';
 
 const initialState = {
   clicks: 0,
@@ -8,16 +10,17 @@ const initialState = {
   fuel: 1,
   fuelMax: 1,
   speed: 0,
-  clickMultiplier: 1,
+  clickMultiplier: 50,
   refilling: false,
   flying: false,
   perks: [],
   upgrades: [],
+  previous: {},
 };
 
 export default function(state = initialState, action) {
   switch (action.type) {
-    case INCREASE_DISTANCE_BY_CLICK:
+    case ROCKET_CLICKED:
 
       let clicks, distance, fuel;
       const needFuel = state.clickMultiplier * rates.fuel;
@@ -35,14 +38,20 @@ export default function(state = initialState, action) {
         distance = (state.distance + state.fuel / rates.fuel);
         fuel = 0
 
-        return {...state, clicks, distance, fuel};
+        return {
+          ...state, clicks, distance, fuel,
+          previous: {...state.previous, distance: state.distance, fuel: state.fuel}
+        };
       };
 
       clicks = state.clicks + 1;
       distance = state.distance + state.clickMultiplier;
       fuel = (state.fuel - needFuel);
 
-      return {...state, clicks, distance, fuel};
+      return {
+        ...state, clicks, distance, fuel, 
+        previous: {...state.previous, distance: state.distance, fuel: state.fuel}
+      };
 
     case TOGGLE_REFILL:
       // If rocket is refilling - stop refilling
@@ -56,13 +65,19 @@ export default function(state = initialState, action) {
         if (costToFillTank <= state.distance) {
           const fuel = state.fuelMax;
           const distance = state.distance - costToFillTank;
-          return {...state, distance, fuel, refilling: !state.refilling};
+          return {
+            ...state, distance, fuel, refilling: !state.refilling,
+            previous: {...state.previous, distance: state.distance, fuel: state.fuel}
+          };
 
         } else {
           // Filling not full tank
           const fuel = state.fuel + state.distance * fuelPriceByOneDistance;
           const distance = 0;
-          return {...state, distance, fuel, refilling: !state.refilling};
+          return {
+            ...state, distance, fuel, refilling: !state.refilling,
+            previous: {...state.previous, distance: state.distance, fuel: state.fuel}
+          };
         }
       } else {
         // Start refilling
@@ -74,6 +89,15 @@ export default function(state = initialState, action) {
       
     case START_FLYING:
       return {...state, flying: true};
+
+    case APPLY_PERK:
+      const perkID = action.payload;
+      const newState = {...state};
+
+      _.mapKeys(allPerks[perkID].apply, (applyValue, applyProp) => {
+        newState[applyProp] = applyValue;
+      });
+      return {...newState, perks: [...state.perks, perkID]};
       
     default:
       return state;

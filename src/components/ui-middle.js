@@ -1,11 +1,11 @@
-import React, { Component, PureComponent } from 'react';
+import React, { Component } from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import _ from 'lodash';
 
 import {perks as allPerks} from '../config/perks';
 
-import {togglePerkAvailable} from '../actions';
+import {togglePerkAvailable, applyPerk} from '../actions';
 
 class MiddleUI extends Component {
 
@@ -85,7 +85,7 @@ class MiddleUI extends Component {
   }
   renderPerk(perkID) {
     return (
-      <div key={perkID} onClick={this.perkClicked} id={perkID} className={`perk ${this.props.ui.perks[perkID] ? 'unlocked' : ''}`}>
+      <div key={perkID} onClick={this.perkClicked.bind(this)} id={perkID} className={`perk ${this.props.ui.perks[perkID] ? 'unlocked' : ''}`}>
         <img src={`./img/icons/${allPerks[perkID].icon}`} width="50%" height="50%" className="perk-upgrade-inside-icon" />
         <p className="perk-upgrade-cost">{allPerks[perkID].requirements.distance}</p>
       </div>
@@ -97,7 +97,7 @@ class MiddleUI extends Component {
   }
   renderUpgrade() {
     return (
-      <div onClick={this.upgradeClicked} id="upgrade1" className="upgrade">
+      <div onClick={this.upgradeClicked.bind(this)} id="upgrade1" className="upgrade">
         <p className="text-monospace text-right upgrade-level">3</p>
         <img src="./img/icons/powerclick.svg" width="50%" height="50%" className="perk-upgrade-inside-icon" />
         <p className="perk-upgrade-cost">1000k</p>
@@ -106,13 +106,19 @@ class MiddleUI extends Component {
   }
 
   perkClicked(perk) {
-    const id = perk.target.closest('.perk').getAttribute('id');
-    console.log(`Perk ${id} Clicked`);
+    const perkID = perk.target.closest('.perk').getAttribute('id');
+    if (this.checkRequirements(allPerks[perkID])) {
+      this.applyPerk(perkID);
+    };
   }
-
   upgradeClicked(upgrade) {
     const id = upgrade.target.closest('.upgrade').getAttribute('id');
     console.log(`Upgrade ${id} Clicked`);
+  }
+
+  applyPerk(perkID) {
+    this.props.applyPerk(perkID);
+    console.log(perkID, 'applied');
   }
 
   render() {
@@ -140,7 +146,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
-    togglePerkAvailable,
+    togglePerkAvailable, applyPerk
   }, dispatch);
 }
 

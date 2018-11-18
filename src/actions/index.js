@@ -3,6 +3,8 @@ export const INCREASE_BG_SPEED_BY1 = 'INCREASE_BG_SPEED_BY1';
 
 export const INCREASE_DISTANCE_BY_CLICK = 'INCREASE_DISTANCE_BY1';
 
+export const ROCKET_CLICKED = 'ROCKET_CLICKED';
+
 export const TOGGLE_REFILL = 'TOGGLE_REFILL';
 export const REFILL_BG_SPEED = 'REFILL_BG_SPEED';
 export const RESTORE_BG_SPEED = 'RESTORE_BG_SPEED';
@@ -11,6 +13,7 @@ export const STOP_FLYING = 'STOP_FLYING';
 export const START_FLYING = 'START_FLYING';
 
 export const TOGGLE_PERK_AVAILABLE = 'TOGGLE_PERK_AVAILABLE';
+export const APPLY_PERK = 'APPLY_PERK';
 
 export function refillBGSpeed() {
   return {
@@ -60,10 +63,26 @@ export function startFlying() {
   }
 }
 
+// -- -- -- ROCKET -- -- -- //
+export function rocketClicked() {
+  return {
+    type: ROCKET_CLICKED
+  }
+}
+
 // -- -- -- PERKS -- -- -- //
 export function togglePerkAvailable(perkID, available) {
   return {
     type: TOGGLE_PERK_AVAILABLE,
     payload: [perkID, available]
+  }
+}
+export function deletePerkFromUI(perkID) {
+
+}
+export function applyPerk(perkID) {
+  return {
+    type: APPLY_PERK,
+    payload: perkID
   }
 }
