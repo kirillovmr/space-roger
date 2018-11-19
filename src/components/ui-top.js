@@ -15,7 +15,7 @@ export function refillClicked() {
     setTimeout(() => {
       this.props.toggleRefill();
       setTimeout(() => this.bgSpeeder(), 1000);
-    }, 3000);
+    }, 2900);
   }
 }
  
@@ -79,7 +79,8 @@ class TopUI extends Component {
       <CountUp 
         start={this.formatNumber(this.props.rocket.previous[param])} 
         end={this.formatNumber(this.props.rocket[param])} 
-        duration={0.6}
+        duration={1.0}
+        useEasing={false}
         decimals={decimals} />
     );
   }

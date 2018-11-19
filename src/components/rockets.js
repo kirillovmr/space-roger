@@ -8,43 +8,39 @@ import KeyHandler, { KEYPRESS } from 'react-key-handler';
 import { increaseDistanceByClick,
   stopFlying, startFlying, rocketClicked } from '../actions';
 
-import {hasPerk} from '../misc';
+export function fireTimer() {
+  // If rocket is flying
+  if(this.props.rocket.flying) {
+    clearTimeout(this.fireTimerId);
+    this.fireTimerId = setTimeout(switchOffFire.bind(this), 1000);
 
-import {refillClicked} from './ui-top';
+  } else {
+    // If rocket is not flying
+    this.props.startFlying();
+    this.fireTimerId = setTimeout(switchOffFire.bind(this), 1000);
+  }
+}
+export function switchOffFire() {
+  this.props.stopFlying();
+}
 
 class Rockets extends Component {
+  componentDidMount() {
+    fireTimer = fireTimer.bind(this);
+  }
+
   shouldComponentUpdate(nextProps) {
     if (this.props.rocket.flying === nextProps.rocket.flying && this.props.rocket.refilling === nextProps.rocket.refilling) {
       return false;
     };
-
     return true;
   }
 
   rocketClicked() {
     if (!this.props.rocket.refilling && this.props.rocket.fuel > 0) {
-
       this.props.rocketClicked();
-      this.fireTimer();
-    } else if (!this.props.rocket.refilling && this.props.rocket.fuel <= 0 && hasPerk('autofuel', this.props.rocket.perks)) {
-      refillClicked();
+      fireTimer();
     }
-  }
-
-  fireTimer() {
-    // If rocket is flying
-    if(this.props.rocket.flying) {
-      clearTimeout(this.fireTimerId);
-      this.fireTimerId = setTimeout(this.switchOffFire.bind(this), 1000);
-
-    } else {
-      // If rocket is not flying
-      this.props.startFlying();
-      this.fireTimerId = setTimeout(this.switchOffFire.bind(this), 1000);
-    }
-  }
-  switchOffFire() {
-    this.props.stopFlying();
   }
 
   render() {

@@ -5,9 +5,16 @@ import _ from 'lodash';
 
 import {perks as allPerks} from '../config/perks';
 
-import {togglePerkAvailable, applyPerk} from '../actions';
+import {togglePerkAvailable, applyPerk, autoFly} from '../actions';
+import {fireTimer} from './rockets';
+import {refillClicked} from './ui-top';
+import {hasPerk} from '../misc';
 
 class MiddleUI extends Component {
+  constructor(props) {
+    super(props);
+    this.perkIntervals = {};
+  }
 
   shouldComponentUpdate(nextProps) {
     if (this.props.ui === nextProps.ui) {
@@ -118,7 +125,44 @@ class MiddleUI extends Component {
 
   applyPerk(perkID) {
     this.props.applyPerk(perkID);
+
     console.log(perkID, 'applied');
+    switch (perkID) {
+      case 'autofly':
+        this.perkAutofly();
+        break;
+      case 'autofuel':
+        this.perkAutofuel();
+      default:
+        break;
+    }
+  }
+
+  /* -- -- PERKS -- -- */
+  perkAutofly() {
+    clearInterval(this.perkIntervals['autofly']);
+    // Dont need Autofuel interval more
+    clearInterval(this.perkIntervals['autofuel']);
+    this.perkIntervals['autofly'] = setInterval(() => {
+      if (!this.props.rocket.refilling && this.props.rocket.fuel > 0) {
+        this.props.autoFly();
+        fireTimer();
+
+      } else if (!this.props.rocket.refilling && this.props.rocket.fuel <= 0 && hasPerk('autofuel', this.props.rocket.perks)) {
+        refillClicked();
+      }
+    }, 1000);
+  }
+  perkAutofuel() {
+    clearInterval(this.perkIntervals['autofuel']);
+    // We dont need this if we have autofly. Autofly able to load fuel.
+    if (!hasPerk('autofly', this.props.rocket.perks)) {
+      this.perkIntervals['autofuel'] = setInterval(() => {
+        if (!this.props.rocket.refilling && this.props.rocket.fuel <= 0 && hasPerk('autofuel', this.props.rocket.perks)) {
+          refillClicked();
+        }
+      }, 500);
+    } 
   }
 
   render() {
@@ -146,7 +190,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
-    togglePerkAvailable, applyPerk
+    togglePerkAvailable, applyPerk, autoFly
   }, dispatch);
 }
 

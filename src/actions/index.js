@@ -86,3 +86,13 @@ export function applyPerk(perkID) {
     payload: perkID
   }
 }
+
+// -- -- -- PERK ACTIONS -- -- -- //
+// -- -- -- -- --- -- -- -- -- -- //
+export const AUTO_FLY = 'AUTO_FLY';
+
+export function autoFly() {
+  return {
+    type: AUTO_FLY
+  };
+}
