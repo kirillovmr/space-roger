@@ -1,8 +1,9 @@
 import {ROCKET_CLICKED, TOGGLE_REFILL,
-  STOP_FLYING, START_FLYING, APPLY_PERK, AUTO_FLY } from '../actions';
+  STOP_FLYING, START_FLYING, APPLY_PERK, APPLY_UPGRADE, AUTO_FLY } from '../actions';
 
 import rates from '../config/rates';
-import {perks as allPerks} from '../config/perks';
+import {perks as allPerks, upgrades as allUpgrades} from '../config/perks';
+import {calcPerkForLevel} from '../misc';
 
 const initialState = {
   clicks: 0,
@@ -10,11 +11,12 @@ const initialState = {
   fuel: 1,
   fuelMax: 1,
   speed: 0,
-  clickMultiplier: 10,
+  clickMultiplier: 100,
   refilling: false,
   flying: false,
   perks: [],
-  upgrades: [],
+  // upgrades: {},
+  upgrades: {},
   previous: {},
 };
 
@@ -87,13 +89,23 @@ export default function(state = initialState, action) {
       
     case START_FLYING:
       return {...state, flying: true};
-
+    
+    case APPLY_UPGRADE:
+      // const currentLevel = state.upgrades[action.payload] || 1;
+      // console.log('Current level:', currentLevel);
+      // console.log('Next level upgrade:', calcPerkForLevel(allUpgrades[action.payload], currentLevel + 1));
+      // Calculating next level perk
     case APPLY_PERK:
       const perkID = action.payload;
       const newState = {...state};
 
-      _.mapKeys(allPerks[perkID].apply, (applyValue, applyProp) => {
+      const perkUpgrade = allPerks[perkID] || allUpgrades[perkID];
+
+      _.mapKeys(perkUpgrade.apply, (applyValue, applyProp) => {
         newState[applyProp] = applyValue;
+        if (applyProp === 'speed') {
+          newState.previous.speed = state.speed;
+        }
       });
       return {...newState, perks: [...state.perks, perkID]};
 

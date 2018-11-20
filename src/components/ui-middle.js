@@ -3,9 +3,9 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import _ from 'lodash';
 
-import {perks as allPerks} from '../config/perks';
+import {perks as allPerks, upgrades as allUpgrades} from '../config/perks';
 
-import {togglePerkAvailable, applyPerk, autoFly} from '../actions';
+import {togglePerkAvailable, applyPerk, applyUpgrade, autoFly} from '../actions';
 import {fireTimer} from './rockets';
 import {refillClicked} from './ui-top';
 import {hasPerk} from '../misc';
@@ -25,48 +25,68 @@ class MiddleUI extends Component {
   }
   
   componentDidMount() {
-    this.checkUpgrades();
+    this.checkPerks();
   }
 
-  // Checking to display upgrades
-  async checkUpgrades() {
+  // Checking to display perks & upgrades
+  async checkPerks() {
+    const toCheck = ['perks', 'upgrades'];
     setInterval(() => {
+      toCheck.forEach((type) => {
+        let allType, unlocked;
 
-      const perksUsed = this.props.rocket.perks;
-      const perksOnScreen = _.keys(this.props.ui.perks);
-
-      // Check perks to Display
-      const perksToCheckDisplay = _.omit(allPerks, _.uniq([...perksUsed, ...perksOnScreen]));
-
-      _.mapKeys(perksToCheckDisplay, (perkPayload, perkID) => {
-        if (perkPayload.display <= this.props.rocket.distance) {
-          this.props.togglePerkAvailable(perkID, false);
+        switch(type) {
+          case 'perks':
+            allType = allPerks;
+            break;
+          case 'upgrades':
+            allType = allUpgrades;
+            break;
         }
-      });
 
-      // Check perks for Requirements
-      // Checking only displayed perks
-      const perksToCheckReq = _.pick(allPerks, perksOnScreen);
-      // console.log('Checking', perksToCheckReq);
+        const used = this.props.rocket[type];
+        const onScreen = _.keys(this.props.ui[type]);
 
-      // Checking perks Requirements
-      _.mapKeys(perksToCheckReq, (perkPayload, perkID) => {
-      
-        if (this.checkRequirements(perkPayload)) {
-          // If perk is locked - unlockeng
-          if(!this.props.ui.perks[perkID]) {
-            this.props.togglePerkAvailable(perkID, true);
+        // Check perks & upgrades to Display
+        const toCheckDisplay = _.omit(allType, _.uniq([...used, ...onScreen]));
+
+        _.mapKeys(toCheckDisplay, (payload, perkID) => {
+          if (payload.display <= this.props.rocket.distance) {
+            this.props.togglePerkAvailable(type, perkID, false);
+          }
+        });
+
+        // Check perks for Requirements
+        // Checking only displayed perks
+        const toCheckReq = _.pick(allType, onScreen);
+        // console.log('Checking', toCheckReq);
+
+        // Checking perks Requirements
+        _.mapKeys(toCheckReq, (payload, perkID) => {
+
+          switch (type) {
+            case 'perks':
+              unlocked = this.props.ui.perks[perkID];
+            break;
+            case 'upgrades':
+              unlocked = this.props.ui.upgrades[perkID].unlocked;
+            break;
+          }
+        
+          if (this.checkRequirements(payload)) {
+            // If perk is locked - unlocking
+            if(!unlocked) {
+              this.props.togglePerkAvailable(type, perkID, true);
+            };
+
+          } else {
+            // If perk is unlocked - locking
+            if(unlocked) {
+              this.props.togglePerkAvailable(type, perkID, false);
+            };
           };
-
-        } else {
-          // If perk is unlocked - locking
-          if(this.props.ui.perks[perkID]) {
-            this.props.togglePerkAvailable(perkID, false);
-          };
-        };
-
+        });
       });
-      
     }, 1000);
   }
 
@@ -75,6 +95,24 @@ class MiddleUI extends Component {
     let fullFillReq = true;
     _.mapKeys(perkPayload.requirements, (reqValue, reqName) => {
 
+      // Check perks
+      if (reqName === 'perks') {
+        reqValue.forEach(perk => {
+          if (!hasPerk(perk, this.props.rocket.perks)) {
+            fullFillReq = false;
+            return;
+          }
+        });
+      }
+
+      // Check upgrades
+      if (reqName === 'upgrades') {
+        console.log('NEED TO ADD CHECKING OF UPGRADES');
+        fullFillReq = false;
+        return;
+      }
+
+      // Check rest single params
       if (this.props.rocket[reqName] < reqValue) {
         fullFillReq = false;
         return;
@@ -83,12 +121,13 @@ class MiddleUI extends Component {
     return fullFillReq;
   }
 
-  renderPerks() {
-    let arrayPerks = [];
-    _.mapKeys(this.props.ui.perks, (perkPayload, perkID) => {
-      arrayPerks.push(this.renderPerk(perkID));
+  renderPerks(perksOrUpgrades) {
+    let array = [];
+    _.mapKeys(this.props.ui[perksOrUpgrades], (perkPayload, ID) => {
+      if (perksOrUpgrades === 'perks') { array.push(this.renderPerk(ID)); } else
+      if (perksOrUpgrades === 'upgrades') { array.push(this.renderUpgrade(ID)); }
     });
-    return arrayPerks;
+    return array;
   }
   renderPerk(perkID) {
     return (
@@ -98,16 +137,12 @@ class MiddleUI extends Component {
       </div>
     );
   }
-
-  renderUpgrades() {
-
-  }
-  renderUpgrade() {
+  renderUpgrade(upgradeID) {
     return (
-      <div onClick={this.upgradeClicked.bind(this)} id="upgrade1" className="upgrade">
-        <p className="text-monospace text-right upgrade-level">3</p>
-        <img src="./img/icons/powerclick.svg" width="50%" height="50%" className="perk-upgrade-inside-icon" />
-        <p className="perk-upgrade-cost">1000k</p>
+      <div key={upgradeID} onClick={this.upgradeClicked.bind(this)} id={upgradeID} className={`upgrade ${this.props.ui.upgrades[upgradeID].unlocked ? 'unlocked' : ''}`}>
+        <p className="text-monospace text-right upgrade-level">{this.props.ui.upgrades[upgradeID].level}</p>
+        <img src={`./img/icons/${allUpgrades[upgradeID].icon}`} width="50%" height="50%" className="perk-upgrade-inside-icon" />
+        <p className="perk-upgrade-cost">{this.props.ui.upgrades[upgradeID].requirements.distance}</p>
       </div>
     );
   }
@@ -119,8 +154,11 @@ class MiddleUI extends Component {
     };
   }
   upgradeClicked(upgrade) {
-    const id = upgrade.target.closest('.upgrade').getAttribute('id');
-    console.log(`Upgrade ${id} Clicked`);
+    const upgradeID = upgrade.target.closest('.upgrade').getAttribute('id');
+    if (this.checkRequirements(allUpgrades[upgradeID])) {
+      console.log(`Applying ${upgradeID}`);
+      this.props.applyUpgrade(upgradeID);
+    };
   }
 
   applyPerk(perkID) {
@@ -170,11 +208,10 @@ class MiddleUI extends Component {
     return(
       <div className="row perks-upgrades">
         <div className="perks-block">
-          {this.renderPerks()}
+          {this.renderPerks('perks')}
         </div>
         <div className="upgrades-block">
-          {this.renderUpgrade()}
-          {this.renderUpgrade()}
+        {this.renderPerks('upgrades')}
         </div>
       </div>
     );
@@ -190,7 +227,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
-    togglePerkAvailable, applyPerk, autoFly
+    togglePerkAvailable, applyPerk, applyUpgrade, autoFly
   }, dispatch);
 }
 
